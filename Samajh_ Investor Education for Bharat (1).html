@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Samajh: understand investing before you risk a rupee</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f5f7fa;--card:#fff;--ink:#14213d;--mute:#56627a;--teal:#0e7c7b;--red:#c8372d;--amber:#e8a317;--line:#d9e0ea}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1626;--card:#18223a;--ink:#eef2f9;--mute:#9aa7c0;--teal:#3cc4c1;--red:#ff6b5e;--amber:#f2b94a;--line:#2b3856}}
+:root[data-theme="dark"]{--bg:#0f1626;--card:#18223a;--ink:#eef2f9;--mute:#9aa7c0;--teal:#3cc4c1;--red:#ff6b5e;--amber:#f2b94a;--line:#2b3856}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:2rem;line-height:1.2;margin:8px 0 6px}h2{font-size:1.25rem;margin:0 0 8px}
+p{margin:0 0 12px}.sub{color:var(--mute);max-width:60ch}
+nav{display:flex;gap:8px;margin:20px 0}
+nav button{flex:1;padding:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+nav button[aria-selected=true]{border-color:var(--teal);background:var(--teal);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.ask{display:flex;gap:8px}.ask input{flex:1;padding:12px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;min-width:0}
+.btn{padding:12px 16px;border:0;border-radius:10px;background:var(--teal);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+.btn.alt{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.say{border-left:5px solid var(--teal);padding-left:14px}
+.warn{border-left:5px solid var(--amber);padding-left:14px;color:var(--mute)}
+.row{display:grid;grid-template-columns:1fr;gap:14px}
+label{font-weight:600;display:flex;justify-content:space-between}
+input[type=range]{width:100%;accent-color:var(--teal);height:32px}
+.jar{height:44px;background:var(--line);border-radius:10px;overflow:hidden;position:relative;margin:8px 0}
+.jar i{display:block;height:100%;background:var(--teal);width:100%;transition:width .5s,background .5s}
+.big{font-size:2.2rem;font-weight:700;line-height:1.1}
+.red{color:var(--red)}.grn{color:var(--teal)}
+svg{width:100%;height:auto;display:block}
+.foot{font-size:.85rem;color:var(--mute);margin-top:28px}
+.hide{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body><main>
+<h1>Samajh</h1>
+<p class="sub">Understand investing in plain words, then feel a market crash with pretend money. No tips. No sign-up. Nothing you type leaves your phone.</p>
+<nav role="tablist"><button role="tab" id="t1" aria-selected="true">Learn</button><button role="tab" id="t2" aria-selected="false">Feel the risk</button></nav>
+
+<section id="learn">
+<div class="card">
+<h2>Pick a word, or ask in your own words</h2>
+<div class="chips" id="chips"></div>
+<div class="ask"><input id="q" placeholder="e.g. what is NAV?" aria-label="Ask a question"><button class="btn" id="go">Explain</button><button class="btn alt" id="mic" aria-label="Speak your question">🎤</button></div>
+</div>
+<div class="card hide" id="ans" aria-live="polite">
+<h2 id="aT"></h2>
+<p class="say" id="aA"></p>
+<p id="aM"></p>
+<p class="warn" id="aW"></p>
+<div class="chips"><button class="btn" id="spk">🔊 Read aloud</button><button class="btn alt" id="stp">Stop</button><button class="btn alt" id="try">Try it with pretend money</button></div>
+</div>
+</section>
+
+<section id="sim" class="hide">
+<div class="card">
+<h2>Pretend money lab</h2>
+<p class="sub">Every rupee here is imaginary. Move the sliders and see what happens.</p>
+<div class="row">
+<div><label for="amt">Pretend money <span id="amtV"></span></label><input type="range" id="amt" min="1000" max="100000" step="1000" value="10000"></div>
+<div><label for="lev">Borrowed power (leverage) <span id="levV"></span></label><input type="range" id="lev" min="1" max="10" step="1" value="1"></div>
+<div><label for="mv">Market moves by <span id="mvV"></span></label><input type="range" id="mv" min="-40" max="30" step="1" value="-20"></div>
+</div>
+<div class="jar" aria-hidden="true"><i id="jar"></i></div>
+<div class="big" id="res"></div>
+<p id="story" style="margin-top:8px"></p>
+<p class="warn" id="lesson"></p>
+</div>
+<div class="card">
+<h2>Replay a bad year</h2>
+<p class="sub">Pretend you put in ₹10,000 and the market falls month after month. When does it feel hard to stay calm?</p>
+<svg viewBox="0 0 400 160" role="img" aria-label="Chart of pretend money over twelve months"><polyline id="line" fill="none" stroke="var(--teal)" stroke-width="3"/><line x1="0" y1="80" x2="400" y2="80" stroke="var(--line)" stroke-dasharray="4"/></svg>
+<p id="rp" aria-live="polite">Press play to start.</p>
+<div class="chips"><button class="btn" id="play">▶ Play</button></div>
+</div>
+</section>
+
+<p class="foot">Samajh teaches ideas. It never says what to buy, sell or hold, and never recommends a broker or product. It stores nothing. Explanations are simplified; for official guidance see investor.sebi.gov.in or call SEBI's helpline 1800 22 7575.</p>
+</main>
+<script>
+const C={
+nav:{t:"NAV (Net Asset Value)",k:"nav net asset value price of unit",a:"NAV is the price of one 'slice' of a mutual fund today.",m:"Think of a big pot of khichdi made by many families. Each family owns slices. NAV is what one slice is worth today: total value of the pot, divided by slices.",w:"A low NAV is not 'cheap' and a high NAV is not 'costly'. NAV alone says nothing about whether a fund is good.",s:[10000,1,-10]},
+vol:{t:"Volatility",k:"volatility volatile up down swing fluctuation",a:"Volatility is how much and how fast a price goes up and down.",m:"Like the monsoon: some years steady, some years wild. A volatile investment can be up 10% this month and down 15% next month. The ride is bumpy even if the road ends up fine.",w:"Bumpy rides tempt people to panic-sell at the bottom. Money you need soon should not be on a bumpy road.",s:[10000,1,-25]},
+div:{t:"Diversification",k:"diversification diversify basket eggs spread",a:"Diversification means not tying all your money to one thing.",m:"A farmer who grows only one crop loses everything if it fails. A farmer with wheat, mustard and vegetables survives a bad season. Spreading reduces the damage from one failure.",w:"It lowers the risk of one thing failing. It does not remove risk, and it cannot protect from a fall of the whole market.",s:[10000,1,-20]},
+fee:{t:"Fees and expenses",k:"fee fees expense ratio charges commission cost",a:"Fees are the small yearly cuts taken from your money, whether you gain or lose.",m:"Like a shopkeeper who keeps 2 paise from every rupee, every year. It sounds tiny, but over 20 years a 2% yearly cut can eat a large part of what your money could have grown to.",w:"Always ask: how much do I pay every year, and who gets it? Be careful of anyone who earns more when you trade more.",s:[10000,1,0]},
+comp:{t:"Compounding",k:"compounding compound interest growth time",a:"Compounding is when your earnings also start earning.",m:"A banyan seed becomes a tree, and the tree drops more seeds. Early growth is slow and boring. The big growth comes late, which is why time matters more than size.",w:"It works against you too: debt at high interest compounds against you. Be wary of anyone promising fast, fixed, high returns.",s:[10000,1,10]},
+lev:{t:"Leverage and F&O",k:"leverage margin f&o futures options derivatives borrowed loan trading",a:"Leverage means betting with borrowed power, so gains and losses both get bigger.",m:"Imagine lifting a heavy sack with a long lever. A small push moves a lot, but if it slips, it can hit you hard. With 5x leverage, a 20% fall can wipe out all your money.",w:"SEBI's own studies found that about 9 out of 10 individual F&O traders had net losses. Never use savings you cannot afford to lose.",s:[10000,5,-20]},
+nom:{t:"Nomination",k:"nomination nominee heir family inheritance death",a:"A nominee is the person who can claim your investments if you are no longer there.",m:"Like writing the name of who gets the keys to your locker. Without it, your family may spend months or years, with paperwork, to claim what is already theirs.",w:"Add nominees on your demat account, bank and every mutual fund folio, and tell your family where they are.",s:[10000,1,0]}};
+const $=i=>document.getElementById(i);let cur=null;
+const chips=$('chips');Object.keys(C).forEach(k=>{const b=document.createElement('button');b.className='chip';b.textContent=C[k].t.split(' (')[0].split(' and')[0];b.setAttribute('aria-pressed','false');b.onclick=()=>show(k);chips.appendChild(b)});
+function find(q){q=q.toLowerCase();let best=null,sc=0;for(const k in C){let s=0;C[k].k.split(' ').forEach(w=>{if(w.length>2&&q.includes(w))s++});if(s>sc){sc=s;best=k}}return best}
+function show(k){cur=k;const c=C[k];$('ans').classList.remove('hide');$('aT').textContent=c.t;$('aA').textContent=c.a;$('aM').textContent=c.m;$('aW').textContent='Be careful: '+c.w;
+[...chips.children].forEach((b,i)=>b.setAttribute('aria-pressed',Object.keys(C)[i]===k));speak()}
+function ask(){const q=$('q').value.trim();if(!q)return;const k=find(q);if(k)show(k);else{cur=null;$('ans').classList.remove('hide');$('aT').textContent="I can explain these words";$('aA').textContent="Try: NAV, volatility, diversification, fees, compounding, leverage or nomination.";$('aM').textContent='';$('aW').textContent="I teach ideas only. I cannot say what to buy or sell.";}}
+$('go').onclick=ask;$('q').onkeydown=e=>{if(e.key==='Enter')ask()};
+function speak(){if(!cur||!window.speechSynthesis)return;speechSynthesis.cancel();const c=C[cur];const u=new SpeechSynthesisUtterance(c.t+'. '+c.a+' '+c.m+' Be careful: '+c.w);u.lang='en-IN';u.rate=.9;speechSynthesis.speak(u)}
+$('spk').onclick=speak;$('stp').onclick=()=>window.speechSynthesis&&speechSynthesis.cancel();
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(!SR)$('mic').style.display='none';else $('mic').onclick=()=>{const r=new SR();r.lang='en-IN';r.onresult=e=>{$('q').value=e.results[0][0].transcript;ask()};r.onerror=()=>{$('aT').textContent='Could not hear you';$('ans').classList.remove('hide')};r.start()};
+function tab(n){$('learn').classList.toggle('hide',n!==1);$('sim').classList.toggle('hide',n!==2);$('t1').setAttribute('aria-selected',n===1);$('t2').setAttribute('aria-selected',n===2);if(n!==1&&window.speechSynthesis)speechSynthesis.cancel()}
+$('t1').onclick=()=>tab(1);$('t2').onclick=()=>tab(2);
+$('try').onclick=()=>{const s=C[cur].s;$('amt').value=s[0];$('lev').value=s[1];$('mv').value=s[2];tab(2);calc();scrollTo(0,0)};
+const R=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+function calc(){const a=+$('amt').value,l=+$('lev').value,m=+$('mv').value;
+$('amtV').textContent=R(a);$('levV').textContent=l+'x';$('mvV').textContent=(m>0?'+':'')+m+'%';
+let v=a+a*l*m/100;const wiped=v<=0;if(wiped)v=0;const ch=v-a;
+$('jar').style.width=Math.min(100,v/a*100)+'%';$('jar').style.background=ch<0?'var(--red)':'var(--teal)';
+$('res').innerHTML=R(v)+' <span class="'+(ch<0?'red':'grn')+'" style="font-size:1.1rem">('+(ch>=0?'+':'')+R(ch)+')</span>';
+let st;if(wiped)st='Everything is gone. With '+l+'x borrowed power, a '+Math.abs(m)+'% fall is bigger than the money you started with. In real life you could even owe more.';
+else if(ch<0)st='You started with '+R(a)+' and are left with '+R(v)+'. Ask yourself honestly: would you sleep well tonight?';
+else if(ch===0)st='Nothing changed. Real markets rarely sit still.';
+else st='Pretend money grew. But the same '+l+'x power would hurt just as much if the market went the other way.';
+$('story').textContent=st;
+$('lesson').textContent=l>1?'Lesson: borrowed power turns a '+Math.abs(m)+'% market move into a '+Math.abs(m*l)+'% move in your money.':'Lesson: even with no borrowing, a falling market hurts. That is why you should invest only money you will not need soon.'}
+['amt','lev','mv'].forEach(i=>$(i).oninput=calc);calc();
+const path=[0,-6,-11,-9,-18,-24,-21,-30,-34,-29,-33,-27];let tm;
+$('play').onclick=()=>{clearInterval(tm);let i=0;const pts=[];const msg=['Month 1: you start with ₹10,000.','Small dip. Normal.','Down more than a tenth. Nervous?','A little relief.','Down nearly a fifth. Friends say "sell now".','Down a quarter. This is where many people sell.','Slight recovery.','Down 30%. Fear is loud.','Worst point: ₹6,600 left.','Recovering.','Still below start.','Month 12: down 27%. Sold at the bottom, the loss is locked in. Stayed, the money can recover with time.'];
+tm=setInterval(()=>{pts.push((i*36)+','+(80-path[i]*1.6));$('line').setAttribute('points',pts.join(' '));$('rp').textContent=msg[i]+' (Value: '+R(10000*(1+path[i]/100))+')';i++;if(i>=path.length)clearInterval(tm)},900)};
+</script>
+<script>
+const EN={};Object.keys(C).forEach(k=>EN[k]={t:C[k].t,a:C[k].a,m:C[k].m,w:C[k].w});
+const HI={
+nav:{t:"NAV (नेट एसेट वैल्यू)",a:"NAV आज के दिन म्यूचुअल फंड की एक 'यूनिट' की कीमत है।",m:"सोचिए कई परिवारों ने मिलकर खिचड़ी की एक बड़ी देग बनाई। हर परिवार के पास कुछ हिस्से हैं। देग की कुल कीमत को हिस्सों से भाग दें, तो एक हिस्से की आज की कीमत NAV है।",w:"कम NAV का मतलब 'सस्ता' और ज़्यादा NAV का मतलब 'महंगा' नहीं होता। सिर्फ NAV देखकर फंड को अच्छा या बुरा नहीं कहा जा सकता।"},
+vol:{t:"वोलैटिलिटी (उतार-चढ़ाव)",a:"वोलैटिलिटी बताती है कि कीमत कितनी और कितनी तेज़ी से ऊपर-नीचे होती है।",m:"मानसून की तरह: कुछ साल शांत, कुछ साल तूफानी। ऐसे निवेश में इस महीने 10% बढ़त और अगले महीने 15% गिरावट हो सकती है। रास्ता भले सही जगह पहुँचे, सफ़र हिचकोलेदार रहता है।",w:"हिचकोलों में घबराकर लोग सबसे नीचे पर बेच देते हैं। जिस पैसे की जल्दी ज़रूरत हो, उसे हिचकोले वाले रास्ते पर न रखें।"},
+div:{t:"डायवर्सिफिकेशन (जोखिम बाँटना)",a:"सारा पैसा एक ही जगह न लगाना डायवर्सिफिकेशन है।",m:"जो किसान सिर्फ एक फसल बोता है, फसल खराब हुई तो सब चला जाता है। जो गेहूँ, सरसों और सब्ज़ी बोता है, वह खराब मौसम झेल लेता है।",w:"इससे एक चीज़ के डूबने का जोखिम घटता है, खत्म नहीं होता। पूरा बाज़ार गिरे तो यह नहीं बचाता।"},
+fee:{t:"फीस और खर्चे",a:"फीस वह छोटी सालाना कटौती है जो आपके फायदे या नुकसान की परवाह किए बिना हर साल कटती है।",m:"जैसे दुकानदार हर रुपये में से हर साल 2 पैसे रख ले। छोटा लगता है, पर 20 साल में हर साल 2% की कटौती आपकी कमाई का बड़ा हिस्सा खा सकती है।",w:"हमेशा पूछिए: मैं हर साल कितना देता हूँ और किसे? जिसकी कमाई आपके ज़्यादा ट्रेड करने से बढ़ती है, उससे सावधान रहें।"},
+comp:{t:"कंपाउंडिंग (ब्याज पर ब्याज)",a:"कंपाउंडिंग में आपकी कमाई भी कमाने लगती है।",m:"बरगद का बीज पेड़ बनता है, पेड़ और बीज गिराता है। शुरुआत धीमी और उबाऊ होती है, बड़ी बढ़त बाद में आती है। इसीलिए रकम से ज़्यादा समय मायने रखता है।",w:"यह उल्टा भी चलता है: ऊँचे ब्याज का कर्ज़ भी आप पर कंपाउंड होता है। तेज़, पक्के, ऊँचे रिटर्न का वादा करने वालों से सावधान रहें।"},
+lev:{t:"लेवरेज और F&O",a:"लेवरेज यानी उधार की ताकत से दाँव लगाना, जिससे फायदा और नुकसान दोनों बड़े हो जाते हैं।",m:"सोचिए लंबे डंडे से भारी बोरा उठा रहे हैं। छोटे धक्के से बहुत हिलता है, पर डंडा फिसला तो ज़ोर की चोट लगती है। 5 गुना लेवरेज पर 20% गिरावट पूरा पैसा खत्म कर सकती है।",w:"SEBI के अध्ययन के अनुसार करीब 10 में से 9 व्यक्तिगत F&O ट्रेडर्स को शुद्ध नुकसान हुआ। जो पैसा खो नहीं सकते, उसे कभी न लगाएँ।"},
+nom:{t:"नॉमिनेशन (नामांकन)",a:"नॉमिनी वह व्यक्ति है जो आपके न रहने पर आपका निवेश क्लेम कर सकता है।",m:"जैसे लॉकर की चाबी किसे मिलेगी, यह नाम लिखना। नॉमिनी न हो तो परिवार को अपना ही पैसा पाने में महीनों या सालों कागज़ी कार्रवाई करनी पड़ सकती है।",w:"डीमैट खाते, बैंक और हर म्यूचुअल फंड फोलियो में नॉमिनी जोड़ें और परिवार को बताएँ।"}};
+const HK={nav:' एनएवी यूनिट',vol:' उतार चढ़ाव वोलैटिलिटी',div:' डायवर्सिफिकेशन बाँटना जोखिम',fee:' फीस खर्चा खर्चे कटौती चार्ज',comp:' कंपाउंडिंग ब्याज',lev:' लेवरेज उधार मार्जिन एफएंडओ',nom:' नॉमिनी नॉमिनेशन नामांकन वारिस'};
+Object.keys(HK).forEach(k=>C[k].k+=HK[k]);
+const HC=['NAV','उतार-चढ़ाव','जोखिम बाँटना','फीस','कंपाउंडिंग','लेवरेज','नॉमिनी'],EC=[...chips.children].map(b=>b.textContent);
+const LE=['Pretend money ','Borrowed power (leverage) ','Market moves by '],LH=['नकली पैसा ','उधार की ताकत (लेवरेज) ','बाज़ार का उतार-चढ़ाव '];
+const HM=['महीना 1: आपने ₹10,000 से शुरू किया।','छोटी गिरावट। सामान्य है।','दसवें हिस्से से ज़्यादा गिरा। घबराहट?','थोड़ी राहत।','करीब पाँचवाँ हिस्सा गिरा। दोस्त कहते हैं "अभी बेच दो"।','एक चौथाई गिरा। यहीं ज़्यादातर लोग बेच देते हैं।','हल्की रिकवरी।','30% नीचे। डर का शोर तेज़ है।','सबसे बुरा बिंदु: ₹6,600 बचे।','सुधार हो रहा है।','अब भी शुरुआत से नीचे।','महीना 12: 27% नीचे। नीचे बेचा तो नुकसान पक्का। रुके रहे तो समय के साथ पैसा लौट सकता है।'];
+let L='en';
+const UI=[['#t1',0,'Learn','सीखें'],['#t2',0,'Feel the risk','जोखिम महसूस करें'],['#go',0,'Explain','समझाइए'],['#spk',0,'🔊 Read aloud','🔊 सुनिए'],['#stp',0,'Stop','रोकें'],['#try',0,'Try it with pretend money','नकली पैसे से आज़माएँ'],['#play',0,'▶ Play','▶ चलाएँ'],
+['#learn h2',0,'Pick a word, or ask in your own words','कोई शब्द चुनें, या अपने शब्दों में पूछें'],['#sim h2',0,'Pretend money lab','नकली पैसों की प्रयोगशाला'],['#sim h2',1,'Replay a bad year','एक बुरा साल दोबारा देखें'],
+['main>p.sub',0,'Understand investing in plain words, then feel a market crash with pretend money. No tips. No sign-up. Nothing you type leaves your phone.','निवेश को आसान शब्दों में समझिए, फिर नकली पैसे से बाज़ार की गिरावट महसूस कीजिए। कोई टिप नहीं। कोई साइन-अप नहीं। आप जो लिखते हैं वह आपके फोन से बाहर नहीं जाता।'],
+['#sim .sub',0,'Every rupee here is imaginary. Move the sliders and see what happens.','यहाँ हर रुपया नकली है। स्लाइडर हिलाइए और देखिए क्या होता है।'],
+['#sim .sub',1,'Pretend you put in ₹10,000 and the market falls month after month. When does it feel hard to stay calm?','मान लीजिए आपने ₹10,000 लगाए और बाज़ार महीने दर महीने गिरता रहा। शांत रहना कब मुश्किल लगता है?'],
+['.foot',0,$('q').closest('main').querySelector('.foot').textContent,'समझ सिर्फ विचार सिखाता है। यह कभी नहीं बताता कि क्या खरीदें, बेचें या रखें, और किसी ब्रोकर या प्रोडक्ट की सिफारिश नहीं करता। यह कुछ भी सेव नहीं करता। स्पष्टीकरण सरल किए गए हैं; आधिकारिक जानकारी के लिए investor.sebi.gov.in देखें या SEBI हेल्पलाइन 1800 22 7575 पर कॉल करें।']];
+function setLang(l){L=l;const hi=l==='hi';document.documentElement.lang=l;
+UI.forEach(([s,i,e,h])=>{const el=document.querySelectorAll(s)[i];if(el)el.textContent=hi?h:e});
+document.querySelectorAll('#sim label').forEach((lb,i)=>lb.firstChild.nodeValue=(hi?LH:LE)[i]);
+Object.keys(C).forEach((k,i)=>{Object.assign(C[k],hi?HI[k]:EN[k]);chips.children[i].textContent=hi?HC[i]:EC[i]});
+$('q').placeholder=hi?'जैसे: NAV क्या है?':'e.g. what is NAV?';$('lg').textContent=hi?'English':'हिन्दी';
+if(cur){const c=C[cur];$('aT').textContent=c.t;$('aA').textContent=c.a;$('aM').textContent=c.m;$('aW').textContent=(hi?'सावधान रहें: ':'Be careful: ')+c.w}
+if(window.speechSynthesis)speechSynthesis.cancel();clearInterval(tm);$('line').setAttribute('points','');$('rp').textContent=hi?'शुरू करने के लिए चलाएँ दबाएँ।':'Press play to start.';calc()}
+const pre=()=>L==='hi'?'सावधान रहें: ':'Be careful: ';
+function show(k){cur=k;const c=C[k];$('ans').classList.remove('hide');$('aT').textContent=c.t;$('aA').textContent=c.a;$('aM').textContent=c.m;$('aW').textContent=pre()+c.w;[...chips.children].forEach((b,i)=>b.setAttribute('aria-pressed',Object.keys(C)[i]===k));speak()}
+function speak(){if(!cur||!window.speechSynthesis)return;speechSynthesis.cancel();const c=C[cur];const u=new SpeechSynthesisUtterance(c.t+'. '+c.a+' '+c.m+' '+pre()+c.w);u.lang=L==='hi'?'hi-IN':'en-IN';u.rate=.9;speechSynthesis.speak(u)}
+function ask(){const q=$('q').value.trim();if(!q)return;const k=find(q);if(k)return show(k);cur=null;const hi=L==='hi';$('ans').classList.remove('hide');
+$('aT').textContent=hi?'मैं इन शब्दों को समझा सकता हूँ':'I can explain these words';$('aA').textContent=hi?'आज़माएँ: NAV, उतार-चढ़ाव, जोखिम बाँटना, फीस, कंपाउंडिंग, लेवरेज या नॉमिनी।':'Try: NAV, volatility, diversification, fees, compounding, leverage or nomination.';$('aM').textContent='';
+$('aW').textContent=hi?'मैं सिर्फ विचार सिखाता हूँ। क्या खरीदें या बेचें, यह नहीं बता सकता।':'I teach ideas only. I cannot say what to buy or sell.'}
+$('spk').onclick=speak;$('go').onclick=ask;$('q').onkeydown=e=>{if(e.key==='Enter')ask()};
+if(SR)$('mic').onclick=()=>{const r=new SR();r.lang=L==='hi'?'hi-IN':'en-IN';r.onresult=e=>{$('q').value=e.results[0][0].transcript;ask()};r.onerror=()=>{$('aT').textContent=L==='hi'?'आवाज़ सुनाई नहीं दी':'Could not hear you';$('ans').classList.remove('hide')};r.start()};
+const calc0=calc;
+calc=function(){if(L!=='hi')return calc0();const a=+$('amt').value,l=+$('lev').value,m=+$('mv').value,ab=Math.abs(m);
+$('amtV').textContent=R(a);$('levV').textContent=l+' गुना';$('mvV').textContent=(m>0?'+':'')+m+'%';
+let v=a+a*l*m/100;const wiped=v<=0;if(wiped)v=0;const ch=v-a;
+$('jar').style.width=Math.min(100,v/a*100)+'%';$('jar').style.background=ch<0?'var(--red)':'var(--teal)';
+$('res').innerHTML=R(v)+' <span class="'+(ch<0?'red':'grn')+'" style="font-size:1.1rem">('+(ch>=0?'+':'')+R(ch)+')</span>';
+$('story').textContent=wiped?'सब कुछ खत्म। '+l+' गुना उधार की ताकत पर '+ab+'% की गिरावट आपकी शुरुआती रकम से बड़ी है। असल ज़िंदगी में आप पर कर्ज़ भी चढ़ सकता है।':ch<0?R(a)+' से शुरू किया और अब '+R(v)+' बचे हैं। खुद से ईमानदारी से पूछिए: क्या आज रात नींद आएगी?':ch===0?'कुछ नहीं बदला। असली बाज़ार शायद ही कभी ठहरते हैं।':'नकली पैसा बढ़ा। लेकिन बाज़ार उल्टा चलता तो यही '+l+' गुना ताकत उतनी ही चोट पहुँचाती।';
+$('lesson').textContent=l>1?'सीख: उधार की ताकत '+ab+'% के बाज़ार उतार को आपके पैसे में '+ab*l+'% का उतार बना देती है।':'सीख: उधार के बिना भी गिरता बाज़ार चोट देता है। इसीलिए सिर्फ वही पैसा लगाइए जिसकी जल्दी ज़रूरत न हो।'};
+['amt','lev','mv'].forEach(i=>$(i).oninput=calc);
+const play0=$('play').onclick;
+$('play').onclick=()=>{if(L!=='hi')return play0();clearInterval(tm);let i=0;const pts=[];tm=setInterval(()=>{pts.push((i*36)+','+(80-path[i]*1.6));$('line').setAttribute('points',pts.join(' '));$('rp').textContent=HM[i]+' (कीमत: '+R(10000*(1+path[i]/100))+')';i++;if(i>=path.length)clearInterval(tm)},900)};
+const lg=document.createElement('button');lg.id='lg';lg.className='btn alt';lg.style.cssText='float:right;margin-top:6px';lg.textContent='हिन्दी';lg.onclick=()=>setLang(L==='hi'?'en':'hi');document.querySelector('h1').before(lg);
+</script></body></html>
